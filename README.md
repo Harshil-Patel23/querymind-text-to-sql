@@ -2,6 +2,16 @@
 
 A powerful Streamlit-based web application that converts natural language questions into SQL queries using the **Groq LLM API** (Llama 3.1). Ask questions about your database in plain English, and the app generates, validates, and executes the appropriate SQL query — complete with auto-visualizations and an interactive schema explorer.
 
+## 🎬 Live Demo
+
+> **Demo Application**: [Text to SQL on Streamlit Cloud](https://querymindtexttosql.streamlit.app/)
+>
+> Try asking questions like:
+>
+> - "Show me all employees in the sales department"
+> - "What is the average salary by department?"
+> - "Which employee has the highest salary?"
+
 ## ✨ Features
 
 - **Natural Language to SQL** — Convert plain English questions into SQL queries powered by Groq's Llama 3.1 model

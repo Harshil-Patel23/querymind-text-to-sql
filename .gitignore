@@ -1,6 +1,7 @@
 .env
 delete.ipynb
 __pycache__/
-.env
-delete.ipynb
-__pycache__/
+deployment_guide.md
+cloud_db_info.txt
+cloud_mysql_guide.md
+Dump20260306.sql
