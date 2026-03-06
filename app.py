@@ -157,7 +157,7 @@ def build_er_diagram(schema: dict):
     )
     st.plotly_chart(fig, use_container_width=True)
 
-st.set_page_config(page_title="Text to SQL", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="QueryMind: Natural Language to SQL", page_icon="🧠", layout="wide")
 st.title("🧠 Text to SQL")
 
 # ---------------------------------------------------------------------------
