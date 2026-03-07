@@ -21,8 +21,9 @@ if not _api_key:
 _client = Groq(api_key=_api_key)
 
 # Model to use — llama3-70b-8192 is free, fast, and excellent at SQL
-_MODEL = "llama-3.1-8b-instant"
 
+# _MODEL = "llama-3.1-8b-instant"
+_MODEL = "llama-3.3-70b-versatile"  
 
 # ---------------------------------------------------------------------------
 # Public function — same signature as before, drop-in replacement

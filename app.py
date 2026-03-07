@@ -9,6 +9,10 @@ from schema_extractor import extract_schema, extract_schema_structured
 from llm_engine import generate_sql, explain_error
 from sql_executor import run_query
 from db_discovery import list_databases, list_sqlite_databases
+# At the top of the file, add this import alongside the existing ones:
+from datetime import datetime
+import pytz
+
 
 
 # ---------------------------------------------------------------------------
@@ -113,12 +117,48 @@ def build_er_diagram(schema: dict):
             ))
 
     # Build node traces (one per table)
+    # node_x, node_y, node_text, node_hover = [], [], [], []
+    # for table in tables:
+    #     x, y = positions[table]
+    #     node_x.append(x)
+    #     node_y.append(y)
+    #     node_text.append(f"<b>{table}</b>")
+    #     # Hover shows all columns
+    #     cols = schema[table]["columns"]
+    #     col_lines = []
+    #     for c in cols:
+    #         prefix = "🔑 " if c["primary_key"] else "   "
+    #         col_lines.append(f"{prefix}{c['name']} ({c['type']})")
+    #     node_hover.append("<br>".join(col_lines))
+
+    # node_trace = go.Scatter(
+    #     x=node_x, y=node_y,
+    #     mode="markers+text",
+    #     marker=dict(size=36, color="#4C78A8", line=dict(width=2, color="white")),
+    #     text=node_text,
+    #     textposition="middle center",
+    #     textfont=dict(size=11, color="#ffffff"),
+    #     hovertext=node_hover,
+    #     hoverinfo="text",
+    #     showlegend=False,
+    # )
+    # Build node traces (one per table)
     node_x, node_y, node_text, node_hover = [], [], [], []
     for table in tables:
         x, y = positions[table]
         node_x.append(x)
         node_y.append(y)
-        node_text.append(f"<b>{table}</b>")
+        # Wrap long names: split into two lines if > 10 chars
+        if len(table) > 10:
+            mid = len(table) // 2
+            # Find nearest space or just split at mid
+            split_at = table.rfind("_", 0, mid + 1)
+            if split_at == -1:
+                split_at = mid
+            wrapped = table[:split_at] + "<br>" + table[split_at:].lstrip("_")
+        else:
+            wrapped = table
+        node_text.append(f"<b>{wrapped}</b>")
         # Hover shows all columns
         cols = schema[table]["columns"]
         col_lines = []
@@ -127,10 +167,20 @@ def build_er_diagram(schema: dict):
             col_lines.append(f"{prefix}{c['name']} ({c['type']})")
         node_hover.append("<br>".join(col_lines))
 
+    # Dynamically size each marker so the name fits inside
+    marker_sizes = []
+    for table in tables:
+        marker_sizes.append(max(60, min(120, len(table) * 9)))
+
     node_trace = go.Scatter(
         x=node_x, y=node_y,
         mode="markers+text",
-        marker=dict(size=36, color="#4C78A8", line=dict(width=2, color="white")),
+        marker=dict(
+            size=marker_sizes,
+            color="#4C78A8",
+            line=dict(width=2, color="white"),
+            sizemode="diameter",
+        ),
         text=node_text,
         textposition="middle center",
         textfont=dict(size=11, color="#ffffff"),
@@ -420,12 +470,14 @@ if "schema" in st.session_state:
                                 file_name="query_result.csv",
                                 mime="text/csv",
                             )
-
+                            IST = pytz.timezone("Asia/Kolkata")
                             st.session_state["query_history"].append({
                                 "question":  st.session_state.get("pending_question", user_question),
                                 "sql":       final_sql,
                                 "rows":      len(df),
-                                "timestamp": datetime.now().strftime("%d %b %H:%M:%S"),
+                                # "timestamp": datetime.now().strftime("%d %b %H:%M:%S"),
+                                
+                                "timestamp": datetime.now(IST).strftime("%d %b %H:%M:%S IST"),
                             })
 
                         except Exception as e:
