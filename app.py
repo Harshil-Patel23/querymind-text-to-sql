@@ -117,48 +117,12 @@ def build_er_diagram(schema: dict):
             ))
 
     # Build node traces (one per table)
-    # node_x, node_y, node_text, node_hover = [], [], [], []
-    # for table in tables:
-    #     x, y = positions[table]
-    #     node_x.append(x)
-    #     node_y.append(y)
-    #     node_text.append(f"<b>{table}</b>")
-    #     # Hover shows all columns
-    #     cols = schema[table]["columns"]
-    #     col_lines = []
-    #     for c in cols:
-    #         prefix = "🔑 " if c["primary_key"] else "   "
-    #         col_lines.append(f"{prefix}{c['name']} ({c['type']})")
-    #     node_hover.append("<br>".join(col_lines))
-
-    # node_trace = go.Scatter(
-    #     x=node_x, y=node_y,
-    #     mode="markers+text",
-    #     marker=dict(size=36, color="#4C78A8", line=dict(width=2, color="white")),
-    #     text=node_text,
-    #     textposition="middle center",
-    #     textfont=dict(size=11, color="#ffffff"),
-    #     hovertext=node_hover,
-    #     hoverinfo="text",
-    #     showlegend=False,
-    # )
-    # Build node traces (one per table)
     node_x, node_y, node_text, node_hover = [], [], [], []
     for table in tables:
         x, y = positions[table]
         node_x.append(x)
         node_y.append(y)
-        # Wrap long names: split into two lines if > 10 chars
-        if len(table) > 10:
-            mid = len(table) // 2
-            # Find nearest space or just split at mid
-            split_at = table.rfind("_", 0, mid + 1)
-            if split_at == -1:
-                split_at = mid
-            wrapped = table[:split_at] + "<br>" + table[split_at:].lstrip("_")
-        else:
-            wrapped = table
-        node_text.append(f"<b>{wrapped}</b>")
+        node_text.append(f"<b>{table}</b>")
         # Hover shows all columns
         cols = schema[table]["columns"]
         col_lines = []
@@ -167,20 +131,10 @@ def build_er_diagram(schema: dict):
             col_lines.append(f"{prefix}{c['name']} ({c['type']})")
         node_hover.append("<br>".join(col_lines))
 
-    # Dynamically size each marker so the name fits inside
-    marker_sizes = []
-    for table in tables:
-        marker_sizes.append(max(60, min(120, len(table) * 9)))
-
     node_trace = go.Scatter(
         x=node_x, y=node_y,
         mode="markers+text",
-        marker=dict(
-            size=marker_sizes,
-            color="#4C78A8",
-            line=dict(width=2, color="white"),
-            sizemode="diameter",
-        ),
+        marker=dict(size=36, color="#4C78A8", line=dict(width=2, color="white")),
         text=node_text,
         textposition="middle center",
         textfont=dict(size=11, color="#ffffff"),
@@ -188,6 +142,53 @@ def build_er_diagram(schema: dict):
         hoverinfo="text",
         showlegend=False,
     )
+
+    # Build node traces (one per table)
+    # node_x, node_y, node_text, node_hover = [], [], [], []
+    # for table in tables:
+    #     x, y = positions[table]
+    #     node_x.append(x)
+    #     node_y.append(y)
+    #     # Wrap long names: split into two lines if > 10 chars
+    #     if len(table) > 10:
+    #         mid = len(table) // 2
+    #         # Find nearest space or just split at mid
+    #         split_at = table.rfind("_", 0, mid + 1)
+    #         if split_at == -1:
+    #             split_at = mid
+    #         wrapped = table[:split_at] + "<br>" + table[split_at:].lstrip("_")
+    #     else:
+    #         wrapped = table
+    #     node_text.append(f"<b>{wrapped}</b>")
+    #     # Hover shows all columns
+    #     cols = schema[table]["columns"]
+    #     col_lines = []
+    #     for c in cols:
+    #         prefix = "🔑 " if c["primary_key"] else "   "
+    #         col_lines.append(f"{prefix}{c['name']} ({c['type']})")
+    #     node_hover.append("<br>".join(col_lines))
+
+    # # Dynamically size each marker so the name fits inside
+    # marker_sizes = []
+    # for table in tables:
+    #     marker_sizes.append(max(60, min(120, len(table) * 9)))
+
+    # node_trace = go.Scatter(
+    #     x=node_x, y=node_y,
+    #     mode="markers+text",
+    #     marker=dict(
+    #         size=marker_sizes,
+    #         color="#4C78A8",
+    #         line=dict(width=2, color="white"),
+    #         sizemode="diameter",
+    #     ),
+    #     text=node_text,
+    #     textposition="middle center",
+    #     textfont=dict(size=11, color="#ffffff"),
+    #     hovertext=node_hover,
+    #     hoverinfo="text",
+    #     showlegend=False,
+    # )
 
     fig = go.Figure(
         data=edge_traces + edge_label_traces + [node_trace],
